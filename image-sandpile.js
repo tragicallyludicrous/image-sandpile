@@ -15,10 +15,10 @@ function preload() {
 }
 function setup() {
   createCanvas(displayHeight, displayHeight);
-  background("white");
   dsImg = downscale(img, DS_FACTOR);
   outImg = downscale(img, DS_FACTOR);
   makeDeltaMask(outImg);
+  image(dsImg, 0, 0, displayHeight, displayHeight);
 }
 
 function draw() {
@@ -32,17 +32,8 @@ function draw() {
 
   stepAbelianSandpile();
   brightenImage();
-  image(dsImg, 0, 0, displayHeight, displayHeight);
   image(outImg, 0, 0, displayHeight, displayHeight);
 }
-
-// function mouseClicked() {
-//   let x = (mouseX / displayHeight) * dsImg.width;
-//   let y = (mouseY / displayHeight) * dsImg.height;
-//   // console.log(`MouseX: ${mouseX}, MouseY: ${mouseY}`);
-//   // console.log(Math.floor(x), Math.floor(y));
-//   increaseDeltaMask(Math.floor(x),Math.floor(y), BRIGHTEN_VALUE);
-// }
 
 function getDeltaMask(x, y) {
   return deltaMask[y][x];
@@ -71,11 +62,11 @@ function brightenImage() {
       let sourceIndex = (x + y * dsImg.width) * 4;
 
       outImg.pixels[sourceIndex + 0] =
-        (dsImg.pixels[sourceIndex + 0] + deltaMask[y][x]) % 255; // R
+        (dsImg.pixels[sourceIndex + 0] + deltaMask[y][x]) % 256; // R
       outImg.pixels[sourceIndex + 1] =
-        (dsImg.pixels[sourceIndex + 1] + deltaMask[y][x]) % 255; // G
+        (dsImg.pixels[sourceIndex + 1] + deltaMask[y][x]) % 256; // G
       outImg.pixels[sourceIndex + 2] =
-        (dsImg.pixels[sourceIndex + 2] + deltaMask[y][x]) % 255; // B
+        (dsImg.pixels[sourceIndex + 2] + deltaMask[y][x]) % 256; // B
       // setting 50% opacity
       outImg.pixels[sourceIndex + 3] = 128;
     }
@@ -127,9 +118,9 @@ function stepAbelianSandpileSlot(x, y) {
     setDeltaMask(x, y, 0);
     var num_valid_directions = 0;
     num_valid_directions += 0 < x ? 1 : 0;
-    num_valid_directions += x < dsImg.width ? 1 : 0;
+    num_valid_directions += x < dsImg.width - 1 ? 1 : 0;
     num_valid_directions += 0 < y ? 1 : 0;
-    num_valid_directions += y < dsImg.height ? 1 : 0;
+    num_valid_directions += y < dsImg.height - 1 ? 1 : 0;
     let to_distribute = Math.floor(lastGrains / num_valid_directions);
     let leftover_grains = lastGrains % num_valid_directions;
     var north_grains = to_distribute;
@@ -138,7 +129,7 @@ function stepAbelianSandpileSlot(x, y) {
     var west_grains = to_distribute;
     var hasDistributedLeftover = false;
     // north
-    if (y < dsImg.height) {
+    if (y < dsImg.height - 1) {
       if (hasDistributedLeftover) {
         increaseDeltaMask(x, y + 1, north_grains);
       } else {
@@ -156,7 +147,7 @@ function stepAbelianSandpileSlot(x, y) {
       }
     }
     // east
-    if (x < dsImg.width) {
+    if (x < dsImg.width - 1) {
       if (hasDistributedLeftover) {
         increaseDeltaMask(x + 1, y, east_grains);
       } else {
