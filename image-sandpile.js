@@ -11,18 +11,17 @@ const GRAINS_PER_CLICK = 255 ** 2; // grains dropped on a cell while the mouse i
 const TOPPLE_THRESHOLD = 255; // a cell topples once it holds at least this many grains
 
 async function setup() {
-  createCanvas(displayHeight, displayHeight);
-  noSmooth();
-
-  const img = await loadImage(
-    "https://assets.codepen.io/4559259/87F20583-FB9D-4B50-A55F-09EAC710AECA_1_105_c.jpeg",
-  );
+  const img = await loadImage("mona_lisa.jpg");
 
   dsImg = downscale(img, DOWNSCALE);
-  outImg = createImage(dsImg.width, dsImg.height);
   gridWidth = dsImg.width;
   gridHeight = dsImg.height;
+  outImg = createImage(gridWidth, gridHeight);
   grains = makeGrid(gridWidth, gridHeight);
+
+  // Canvas matches the grid's aspect ratio so the image isn't stretched.
+  createCanvas(displayHeight * (gridWidth / gridHeight), displayHeight);
+  noSmooth();
 
   image(dsImg, 0, 0, width, height); // opaque first frame to blend onto
 }
